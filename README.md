@@ -1,6 +1,13 @@
 <H1>PRIVATE KEY RECOVERY FROM ETHEREUM KEYSTORE</H1>
 
-script to retrieve private key from files contained in keystore knowing the associated passphrase.
+Script to retrieve private key from files contained in keystore knowing the associated passphrase.
+
+The following libraries are needed:
+
+<code>pip install pysha3 
+pip install pyaes
+pip install scrypt
+pip install eth_keys</code>
 
 According to what has been investigated so far, the process followed for the storage of the key pair in both Ethereum and Quorum follows the following encryption scheme:
 
