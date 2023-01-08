@@ -1,28 +1,28 @@
-<H1>RECUPERACIÓN DE LLAVE PRIVADA DEL ETHEREUM KEYSTORE</H1>
+<H1>PRIVATE KEY RECOVERY FROM ETHEREUM KEYSTORE</H1>
 
-script para recuperar clave privada desde archivos contenidos en keystore conociendo el passphrase asociado.
+script to retrieve private key from files contained in keystore knowing the associated passphrase.
 
-Según lo investigado hasta ahora el proceso seguido para el almacenamiento de el par de llaves tanto en Ethereum como en Quorum, sigue el siguiente esquema de cifrado:
+According to what has been investigated so far, the process followed for the storage of the key pair in both Ethereum and Quorum follows the following encryption scheme:
 
-![alt text "bloques-kdf-aes"](keystore.drawio.png)
+![alt text "blocks-kdf-aes"](keystore.drawio.png)
 
-Tanto Ethereum como Quorum almacenan las llaves en el directorio <b>Keystore</b> y todos los parámetros requeridos están contenidos en los archivos json, que son almacenados dentro de éste directorio. El keystore contiene los datos necesarios para la reconstrucción de la llave privada asociada a la dirección pública contenida en los archivos json.
+Both Ethereum and Quorum store the keys in the <b>Keystore</b> directory and all the required parameters are contained in the json files, which are stored inside this directory. The keystore contains the data necessary to rebuild the private key associated with the public address contained in the json files.
 
-Cada archivo json en el directorio posee la información asociada a cada dirección pública. El archivo contiene los parámetros para generar una clave derivada kdf que a su vez es utilizada para generar la llave privada a la salida del módulo de cifrado aes-128-ctr. Para poder regenerar la llave es necesario contar con el <b>passphrase</b> que el cliente (o la aplicación internamente) ha utilizado para construir la dirección.
+Each json file in the directory has the information associated with each public address. The file contains the parameters to generate a kdf derived key which in turn is used to generate the private key at the output of the aes-128-ctr encryption module. In order to regenerate the key, it is necessary to have the <b>passphrase</b> that the client (or the application internally) has used to build the address.
 
-Cabe destacar que el ciphertext requerido como parámetro de entrada al módulo AES corresponde a la clave privada Ethereum cifrada.
+It should be noted that the ciphertext required as input parameter to the AES module corresponds to the encrypted Ethereum private key.
 
-<li>Parámetros requeridos para el módulo KDF: {klen,r,n,p,salt} y el passphrase.
-<li>Parámetros requeridos para el módulo AES-128-CTR: {iv, ciphertext, kdf_key}.
+<li>Required parameters for the KDF module: {klen,r,n,p,salt} and the passphrase.
+<li>Required parameters for the AES-128-CTR module: {iv, ciphertext, kdf_key}.
 
-<H2>Verificación de la MAC</H2>
-una vez determinada la clave derivada (kdf) se procede a verificar la MAC teniendo en cuenta que se debe realizar una concatenación de los 16 bytes menos significativos del kdf en hexadecimal con el ciphertext en hexadecimal (concatenacion_hex = kdf_hex[32:64] + ciphertext_hex). Al resultado de la concatenación se le calcula la huella utilizando el estandar keccak_256 (keccak_256(concatenacion_bytes)).
+<H2>MAC Verification</H2>
+Once the derived key (kdf) has been determined, the MAC is verified taking into account that a concatenation of the 16 least significant bytes of the kdf in hexadecimal must be carried out with the ciphertext in hexadecimal (concatenation_hex = kdf_hex[32:64] + ciphertext_hex ). The result of the concatenation is fingerprinted using the standard keccak_256 (keccak_256(concatenacion_bytes)).
 
 
-<H2>Decifrado de la Clave Privada</H2>
-se pasan los siguientes parámetros al módulo AES-128-CTR:
-  <li>vector de inicialización en entero (iv_int = int(iv,16))
-  <li>16 bytes más significativos de la kdf en bytes (kdf_key_bytes)
-  <li>ciphertext en bytes (ciphertext_bytes)
+<H2>Private Key Decryption</H2>
+the following parameters are passed to the AES-128-CTR module:
+  <li>initialization vector to integer (iv_int = int(iv,16))
+  <li>16 most significant bytes of the kdf in bytes (kdf_key_bytes)
+  <li>ciphertext in bytes (ciphertext_bytes)
     
- el resultado obtenido es convertido a hexadecimal (decrypted_priv_key_hex).
+ the result obtained is converted to hexadecimal (decrypted_priv_key_hex).
